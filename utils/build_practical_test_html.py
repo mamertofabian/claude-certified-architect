@@ -2,11 +2,15 @@
 """Build practical_test_<lang>.html for one or all languages.
 Usage: python3 build_html.py [lang]   (lang: en, ru, ja, zh — default: all)
 """
-import json, subprocess, os, sys
+
+import json
+import subprocess
+import os
+import sys
 
 # utils/ is one level inside the project root
 UTILS_DIR = os.path.dirname(os.path.abspath(__file__))
-ROOT_DIR  = os.path.dirname(UTILS_DIR)
+ROOT_DIR = os.path.dirname(UTILS_DIR)
 
 LANG_TITLES = {
     "en": "Claude Certified Architect \u2014 Practical Test",
@@ -15,12 +19,16 @@ LANG_TITLES = {
     "zh": "Claude Certified Architect \u2014 \u6a21\u62df\u6d4b\u8bd5",
 }
 
+
 def get_questions(lang):
     result = subprocess.run(
         ["python3", "extract_question.py", lang, "all"],
-        capture_output=True, text=True, cwd=ROOT_DIR
+        capture_output=True,
+        text=True,
+        cwd=ROOT_DIR,
     )
     return json.loads(result.stdout)
+
 
 BUILD_LANGS = sys.argv[1:] if len(sys.argv) > 1 else list(LANG_TITLES.keys())
 
@@ -232,9 +240,35 @@ body {
 """
 
 JS = r"""
-const QUESTIONS = __DATA__;
+const QUESTIONS_RAW = __DATA__;
+let QUESTIONS = [];
 
 const state = { current: 0, answers: {} };
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function randomizeQuestions() {
+  const byScenario = {};
+  const scenarioOrder = [];
+  QUESTIONS_RAW.forEach(q => {
+    if (!byScenario[q.scenario]) {
+      byScenario[q.scenario] = [];
+      scenarioOrder.push(q.scenario);
+    }
+    byScenario[q.scenario].push(q);
+  });
+  QUESTIONS = [];
+  shuffle(scenarioOrder).forEach(scenario => {
+    QUESTIONS.push(...shuffle(byScenario[scenario]));
+  });
+}
 
 function md(text) {
   if (!text) return '';
@@ -265,7 +299,7 @@ function buildSidebar() {
     btn.className = 'q-btn';
     btn.id = 'sb-' + idx;
     btn.onclick = () => goto(idx);
-    btn.innerHTML = '<span class="q-dot"></span> Q' + q.global_n;
+    btn.innerHTML = '<span class="q-dot"></span> Q' + (idx + 1);
     groupEl.appendChild(btn);
   });
 }
@@ -410,20 +444,25 @@ function restart() {
   state.current = 0;
   document.getElementById('questionScreen').classList.add('active');
   document.getElementById('summaryScreen').classList.remove('active');
+  document.getElementById('sidebarList').innerHTML = '';
+  randomizeQuestions();
+  buildSidebar();
   renderQuestion(0);
   updateSidebar();
 }
 
+randomizeQuestions();
 buildSidebar();
 renderQuestion(0);
 updateSidebar();
 """
 
+
 def build(lang):
     questions = get_questions(lang)
     js_data = json.dumps(questions, ensure_ascii=False)
     title = LANG_TITLES[lang]
-    js = JS.replace('__DATA__', js_data)
+    js = JS.replace("__DATA__", js_data)
 
     HTML = f"""<!DOCTYPE html>
 <html lang="{lang}">
@@ -464,10 +503,12 @@ def build(lang):
 </body>
 </html>"""
 
-    out = os.path.join(ROOT_DIR, f'practical_test_{lang}.html')
-    with open(out, 'w', encoding='utf-8') as f:
+    out = os.path.join(ROOT_DIR, f"practical_test_{lang}.html")
+    with open(out, "w", encoding="utf-8") as f:
         f.write(HTML)
-    print(f"Written: practical_test_{lang}.html  ({len(HTML):,} bytes, {len(questions)} questions)")
+    print(
+        f"Written: practical_test_{lang}.html  ({len(HTML):,} bytes, {len(questions)} questions)"
+    )
 
 
 for lang in BUILD_LANGS:
