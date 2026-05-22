@@ -34,6 +34,14 @@ This repository contains study materials for the **Claude Certified Architect â€
 - **Urdu guide**: [`guide_ur.pdf`](./pdf/guide_ur.pdf)
 - **Arabic guide**: [`guide_ar.pdf`](./pdf/guide_ar.pdf)
 
+## Practical Test (English)
+
+Interactive practice exam with shuffled scenarios and questions:
+
+**https://mamertofabian.github.io/claude-certified-architect/**
+
+Local file: [`practical_test_en.html`](./practical_test_en.html)
+
 ## How to Use
 
 - Read the guide that matches your preferred language.
