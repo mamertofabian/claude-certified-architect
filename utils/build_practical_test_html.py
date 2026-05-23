@@ -44,26 +44,46 @@ body {
   min-height: 100vh;
 }
 
-.shell { display: flex; height: 100vh; overflow: hidden; }
+.shell { display: flex; height: 100vh; height: 100dvh; overflow: hidden; }
+
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 90;
+}
+.sidebar-backdrop.show { display: block; }
 
 /* Sidebar */
 .sidebar {
   width: 260px; min-width: 260px;
   background: #1a1a2e; color: #cdd3de;
   display: flex; flex-direction: column; overflow: hidden;
+  flex-shrink: 0;
 }
 .sidebar-header {
   padding: 20px 16px 14px;
   font-size: 13px; font-weight: 700;
   letter-spacing: .06em; text-transform: uppercase;
   color: #7f8fa6; border-bottom: 1px solid #2c2c4a; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
 }
+.sidebar-close {
+  display: none;
+  width: 36px; height: 36px; min-width: 36px;
+  border: none; border-radius: 8px;
+  background: #2c2c4a; color: #e2e8f0;
+  font-size: 22px; line-height: 1; cursor: pointer;
+  align-items: center; justify-content: center;
+}
+.sidebar-close:hover { background: #3d3d66; }
 .sidebar-progress {
   padding: 10px 16px; font-size: 12px; color: #7f8fa6;
   border-bottom: 1px solid #2c2c4a; flex-shrink: 0;
 }
 .sidebar-progress span { color: #e2e8f0; font-weight: 600; }
-.sidebar-scroll { overflow-y: auto; flex: 1; padding: 8px 0; }
+.sidebar-scroll { overflow-y: auto; flex: 1; padding: 8px 0; -webkit-overflow-scrolling: touch; }
 .sidebar-scroll::-webkit-scrollbar { width: 4px; }
 .sidebar-scroll::-webkit-scrollbar-thumb { background: #2c2c4a; border-radius: 2px; }
 
@@ -74,7 +94,7 @@ body {
 }
 .q-btn {
   display: flex; align-items: center; gap: 8px;
-  width: 100%; padding: 6px 16px;
+  width: 100%; padding: 10px 16px; min-height: 44px;
   background: none; border: none; cursor: pointer;
   font-size: 13.5px; color: #a0aec0; text-align: left;
   transition: background .15s, color .15s;
@@ -99,10 +119,24 @@ body {
   justify-content: space-between; flex-shrink: 0;
   box-shadow: 0 1px 3px rgba(0,0,0,.06);
 }
-.topbar-title { font-size: 15px; font-weight: 600; color: #2d3748; }
-.topbar-nav { display: flex; gap: 10px; align-items: center; }
+.menu-btn {
+  display: none;
+  width: 44px; height: 44px; min-width: 44px;
+  border: 1.5px solid #cbd5e0; border-radius: 8px;
+  background: #fff; color: #2d3748;
+  font-size: 20px; cursor: pointer;
+  align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.menu-btn:hover { background: #edf2f7; }
+.topbar-left {
+  display: flex; align-items: center; gap: 10px;
+  flex: 1; min-width: 0;
+}
+.topbar-title { font-size: 15px; font-weight: 600; color: #2d3748; line-height: 1.35; }
+.topbar-nav { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .nav-btn {
-  padding: 7px 18px; border-radius: 8px;
+  padding: 10px 18px; min-height: 44px; border-radius: 8px;
   border: 1.5px solid #cbd5e0; background: #fff;
   font-size: 14px; cursor: pointer; color: #4a5568; font-weight: 500;
   transition: all .15s;
@@ -113,12 +147,34 @@ body {
 .nav-btn.finish:hover { background: #2c5282; }
 .q-counter { font-size: 13px; color: #718096; font-weight: 500; }
 
-.content { flex: 1; overflow-y: auto; padding: 36px 48px; }
+.content { flex: 1; overflow-y: auto; padding: 36px 48px; -webkit-overflow-scrolling: touch; }
 .content::-webkit-scrollbar { width: 6px; }
 .content::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 3px; }
 
 /* Question card */
+#questionScreen { overflow-x: hidden; }
 .q-card { max-width: 820px; margin: 0 auto; }
+.q-card.slide-out-left { animation: qSlideOutLeft 0.2s ease forwards; }
+.q-card.slide-out-right { animation: qSlideOutRight 0.2s ease forwards; }
+.q-card.slide-in-left { animation: qSlideInLeft 0.26s ease forwards; }
+.q-card.slide-in-right { animation: qSlideInRight 0.26s ease forwards; }
+@keyframes qSlideOutLeft {
+  to { opacity: 0; transform: translateX(-24px); }
+}
+@keyframes qSlideOutRight {
+  to { opacity: 0; transform: translateX(24px); }
+}
+@keyframes qSlideInLeft {
+  from { opacity: 0; transform: translateX(-24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes qSlideInRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .q-card[class*="slide-"] { animation: none !important; }
+}
 .q-scenario {
   display: inline-block; background: #ebf8ff; color: #2b6cb0;
   font-size: 12px; font-weight: 700; letter-spacing: .05em;
@@ -140,7 +196,9 @@ body {
   background: #e2e8f0; padding: 1px 5px; border-radius: 4px;
   font-family: "SF Mono", Menlo, Monaco, monospace;
   font-size: 13.5px; color: #2d3748;
+  word-break: break-word;
 }
+.opt-text { overflow-wrap: anywhere; }
 .explanation code { background: #feebc8; }
 .q-prompt { font-size: 17px; font-weight: 700; color: #1a202c; margin-bottom: 20px; }
 
@@ -237,6 +295,61 @@ body {
 
 .screen { display: none; }
 .screen.active { display: block; }
+#questionScreen.active { touch-action: pan-y; }
+
+@media (max-width: 900px) {
+  .topbar { padding: 10px 16px; gap: 8px; flex-wrap: wrap; }
+  .topbar-title { font-size: 14px; }
+  .content { padding: 20px 16px; }
+  .q-situation { font-size: 15.5px; padding: 14px 16px; }
+  .q-prompt { font-size: 16px; }
+  .score-grid { grid-template-columns: 1fr; gap: 12px; }
+  .score-card .big { font-size: 32px; }
+  .group-title { flex-wrap: wrap; }
+  .restart-btn { width: 100%; }
+}
+
+@media (max-width: 768px) {
+  .menu-btn { display: flex; }
+  .sidebar-close { display: flex; }
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: min(300px, 88vw);
+    min-width: 0;
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .main { width: 100%; min-width: 0; }
+  .topbar-nav {
+    width: 100%;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .q-counter {
+    width: 100%;
+    order: -1;
+    text-align: center;
+    padding-bottom: 4px;
+  }
+  .nav-btn { flex: 1; padding: 10px 8px; font-size: 13px; }
+  .nav-btn.finish { flex: 1.4; }
+  .summary h1 { font-size: 22px; }
+  .wrong-item { flex-direction: column; gap: 4px; }
+  .wrong-item .wi-n { padding-top: 0; }
+}
+
+@media (max-width: 480px) {
+  body { font-size: 15px; }
+  .topbar-title { font-size: 12px; }
+  .option { padding: 12px 14px; gap: 12px; }
+  .opt-text { font-size: 14px; padding-top: 2px; }
+  .explanation { font-size: 14px; padding: 12px 14px; }
+  .group-block { padding: 14px 16px; }
+}
 """
 
 JS = r"""
@@ -244,6 +357,20 @@ const QUESTIONS_RAW = __DATA__;
 let QUESTIONS = [];
 
 const state = { current: 0, answers: {} };
+let navDirection = 0;
+let questionAnimating = false;
+
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarBackdrop').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarBackdrop').classList.remove('show');
+  document.body.style.overflow = '';
+}
 
 function shuffle(arr) {
   const a = arr.slice();
@@ -318,14 +445,10 @@ function updateSidebar() {
   document.getElementById('answeredCount').textContent = Object.keys(state.answers).length;
 }
 
-function renderQuestion(idx) {
+function buildQuestionHtml(idx) {
   const q = QUESTIONS[idx];
   const chosen = state.answers[q.global_n];
   const locked = chosen !== undefined;
-
-  document.getElementById('qCounter').textContent = (idx + 1) + ' / ' + QUESTIONS.length;
-  document.getElementById('prevBtn').disabled = idx === 0;
-  document.getElementById('nextBtn').disabled = idx === QUESTIONS.length - 1;
 
   const optionsHtml = q.options.map(opt => {
     let cls = 'option';
@@ -344,8 +467,7 @@ function renderQuestion(idx) {
     ? '<div class="explanation show"><strong>Why ' + q.correct + ':</strong> ' + md(q.explanation) + '</div>'
     : '<div class="explanation"></div>';
 
-  document.getElementById('qCard').innerHTML =
-    '<div class="q-number">Question ' + q.global_n + '</div>' +
+  return '<div class="q-number">Question ' + q.global_n + '</div>' +
     '<div class="q-scenario">' + q.scenario + '</div>' +
     '<div class="q-situation">' + md(q.situation) + '</div>' +
     '<div class="q-prompt">' + md(q.question) + '</div>' +
@@ -353,25 +475,107 @@ function renderQuestion(idx) {
     expl;
 }
 
+function updateQuestionChrome(idx) {
+  document.getElementById('qCounter').textContent = (idx + 1) + ' / ' + QUESTIONS.length;
+  document.getElementById('prevBtn').disabled = idx === 0;
+  document.getElementById('nextBtn').disabled = idx === QUESTIONS.length - 1;
+}
+
+function renderQuestion(idx, animate) {
+  const card = document.getElementById('qCard');
+  updateQuestionChrome(idx);
+
+  if (!animate || navDirection === 0 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    questionAnimating = false;
+    card.className = 'q-card';
+    card.innerHTML = buildQuestionHtml(idx);
+    return;
+  }
+
+  const outClass = navDirection > 0 ? 'slide-out-left' : 'slide-out-right';
+  const inClass = navDirection > 0 ? 'slide-in-right' : 'slide-in-left';
+
+  if (questionAnimating) {
+    card.className = 'q-card';
+    card.innerHTML = buildQuestionHtml(idx);
+    questionAnimating = false;
+    return;
+  }
+
+  questionAnimating = true;
+  card.className = 'q-card ' + outClass;
+
+  function onOutEnd() {
+    card.removeEventListener('animationend', onOutEnd);
+    card.className = 'q-card ' + inClass;
+    card.innerHTML = buildQuestionHtml(idx);
+
+    function onInEnd() {
+      card.removeEventListener('animationend', onInEnd);
+      card.className = 'q-card';
+      questionAnimating = false;
+    }
+    card.addEventListener('animationend', onInEnd);
+  }
+  card.addEventListener('animationend', onOutEnd);
+}
+
 function answer(globalN, letter) {
   if (state.answers[globalN] !== undefined) return;
   state.answers[globalN] = letter;
-  renderQuestion(state.current);
+  renderQuestion(state.current, false);
   updateSidebar();
 }
 
 function navigate(dir) { goto(state.current + dir); }
 
+const swipeNav = { startX: 0, startY: 0, tracking: false };
+
+function initSwipeNavigation() {
+  const el = document.getElementById('questionScreen');
+  const threshold = 50;
+
+  el.addEventListener('touchstart', function(e) {
+    if (!el.classList.contains('active')) return;
+    if (e.touches.length !== 1) return;
+    if (document.getElementById('sidebar').classList.contains('open')) return;
+    swipeNav.startX = e.touches[0].clientX;
+    swipeNav.startY = e.touches[0].clientY;
+    swipeNav.tracking = true;
+  }, { passive: true });
+
+  el.addEventListener('touchend', function(e) {
+    if (!swipeNav.tracking) return;
+    swipeNav.tracking = false;
+    if (!el.classList.contains('active')) return;
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - swipeNav.startX;
+    const dy = touch.clientY - swipeNav.startY;
+    if (Math.abs(dx) < threshold || Math.abs(dx) < Math.abs(dy)) return;
+    if (dx < 0) navigate(1);
+    else navigate(-1);
+  }, { passive: true });
+
+  el.addEventListener('touchcancel', function() {
+    swipeNav.tracking = false;
+  }, { passive: true });
+}
+
 function goto(idx) {
   if (idx < 0 || idx >= QUESTIONS.length) return;
   document.getElementById('questionScreen').classList.add('active');
   document.getElementById('summaryScreen').classList.remove('active');
+  const prev = state.current;
+  navDirection = idx === prev ? 0 : (idx > prev ? 1 : -1);
   state.current = idx;
-  renderQuestion(idx);
+  renderQuestion(idx, prev !== idx);
   updateSidebar();
+  closeSidebar();
+  navDirection = 0;
 }
 
 function showSummary() {
+  closeSidebar();
   document.getElementById('questionScreen').classList.remove('active');
   document.getElementById('summaryScreen').classList.add('active');
 
@@ -447,14 +651,15 @@ function restart() {
   document.getElementById('sidebarList').innerHTML = '';
   randomizeQuestions();
   buildSidebar();
-  renderQuestion(0);
+  renderQuestion(0, false);
   updateSidebar();
 }
 
 randomizeQuestions();
 buildSidebar();
-renderQuestion(0);
+renderQuestion(0, false);
 updateSidebar();
+initSwipeNavigation();
 """
 
 
@@ -473,15 +678,22 @@ def build(lang):
 <style>{CSS}</style>
 </head>
 <body>
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
 <div class="shell">
-  <nav class="sidebar">
-    <div class="sidebar-header">Questions</div>
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span>Questions</span>
+      <button type="button" class="sidebar-close" id="sidebarClose" onclick="closeSidebar()" aria-label="Close question list">&times;</button>
+    </div>
     <div class="sidebar-progress">Answered: <span id="answeredCount">0</span> / <span id="totalCount">0</span></div>
     <div class="sidebar-scroll" id="sidebarList"></div>
   </nav>
   <div class="main">
     <div class="topbar">
-      <div class="topbar-title">{title}</div>
+      <div class="topbar-left">
+        <button type="button" class="menu-btn" id="menuBtn" onclick="openSidebar()" aria-label="Open question list">&#9776;</button>
+        <div class="topbar-title">{title}</div>
+      </div>
       <div class="topbar-nav">
         <span class="q-counter" id="qCounter"></span>
         <button class="nav-btn" id="prevBtn" onclick="navigate(-1)" disabled>&#8592; Prev</button>
